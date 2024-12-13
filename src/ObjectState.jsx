@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SingleData from './SingleData';
 import toast from 'react-hot-toast';
 
@@ -12,6 +12,7 @@ const ObjectState = () => {
 
   const [formFiles, serFormFiles] = useState([])
   const [data, setData] = useState([])
+  const [error,setError] = useState(false)
 
   const { name, email, dob, address } = form;
 //   console.log(name, email, dob, address); // Access each value individually
@@ -37,7 +38,9 @@ const handleSubmit = (e)=>{
   e.preventDefault();
   if (!form.name || !form.email || !form.dob || !form.address) {
     toast.error("Please fill in all required fields.");
+    setError(true)
   } else {
+    setError(false)
     setData([...data, { ...form, formFiles, id: Date.now() }]);
     setForm({ name: "", email: "", dob: "", address: "" });
 
@@ -52,9 +55,15 @@ const newId = data?.filter((item,index)=>{
   return item?.id !== id
 })
 setData(newId)
-toast.error("Remove Successfully")
+toast.success("Remove Successfully")
 
 }
+
+useEffect(()=>{
+if(form){
+  setError(false)
+}
+},[form])
 
 
   return (
@@ -69,7 +78,7 @@ toast.error("Remove Successfully")
               onChange={handleChange}
               type="text"
               placeholder="Enter Your Name..."
-              className="form-control"
+              className={`form-control ${error ? "is-invalid" : ""}`}
               name="name"
               required
             />
@@ -81,7 +90,7 @@ toast.error("Remove Successfully")
               onChange={handleChange}
               type="email"
               placeholder="Enter Your Email..."
-              className="form-control"
+              className={`form-control ${error ? "is-invalid" : ""}`}
               name="email"
               required
             />
@@ -93,7 +102,7 @@ toast.error("Remove Successfully")
               onChange={handleChange}
               type="date"
               placeholder="Enter Your dob..."
-              className="form-control"
+              className={`form-control ${error ? "is-invalid" : ""}`}
               name="dob"
               required
             />
@@ -105,7 +114,7 @@ toast.error("Remove Successfully")
               onChange={handleChange}
               type="text"
               placeholder="Enter Your Address..."
-              className="form-control"
+              className={`form-control ${error ? "is-invalid" : ""}`}
               name="address"
               required
             />
@@ -114,8 +123,8 @@ toast.error("Remove Successfully")
             <label>Image</label>
             <input
               type="file"
-              className="form-control"
               onChange={handleimagechange}
+              className={`form-control ${error ? "is-invalid" : ""}`}
               multiple
             />
           </div>
@@ -158,16 +167,17 @@ toast.error("Remove Successfully")
             </>
           )}
 
-          <button onClick={handleSubmit} className="btn btn-success w-100 my-2">Add</button>
+          <button onClick={handleSubmit} className="btn btn-success w-100 my-2">
+            Add
+          </button>
         </form>
       </div>
 
       <div className="container row mx-auto">
-        {data?.map((items,index)=>{
-          return <SingleData key={index} {...items} remove={handleRemove} />
+        {data?.map((items, index) => {
+          return <SingleData key={index} {...items} remove={handleRemove} />;
         })}
       </div>
-      
     </>
   );
 }
